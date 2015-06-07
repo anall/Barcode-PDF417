@@ -1,0 +1,45 @@
+{
+   "abstract" : "The great new Barcode::PDF417!",
+   "author" : [
+      "Andrea Nall <anall@andreanall.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Barcode-PDF417",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Barcode::PDF417" : {
+         "file" : "lib/Barcode/PDF417.pm",
+         "version" : "0.01"
+      },
+      "Barcode::PDF417::PP" : {
+         "file" : "lib/Barcode/PDF417/PP.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ]
+   },
+   "version" : "0.01"
+}
