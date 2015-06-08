@@ -2,14 +2,17 @@ Build.PL
 Changes
 lib/Barcode/PDF417.pm
 lib/Barcode/PDF417/PP.pm
+lib/Barcode/PDF417/PP_Tables.pm
 MANIFEST			This list of files
 README
-xt/00-load.t
-xt/manifest.t
-xt/pod-coverage.t
-xt/pod.t
-xt/boilerplate.t
-t/number-compaction.t
 Makefile.PL
 META.yml
 META.json
+LICENSE
+data/codewords
+data/coeff
+tools/generate.pl
+java/BarcodePDF417Decode.java
+t/number-compaction.t
+t/error-correction.t
+t/decode-simple.t

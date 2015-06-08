@@ -75,7 +75,7 @@ EOS
     die "sanity: cIdx == -1\n" if $cIdx == -1;
     my $eCoeff = 2**($cIdx+1);
     die "sanity: got " . @coeff . ", expected $eCoeff coefficients for $cIdx\n" if $eCoeff != @coeff;
-    print $fh "  [" . join(",",reverse @coeff) . "], # $cIdx " . @coeff . "\n";
+    print $fh "  [" . join(",",@coeff) . "], # $cIdx " . @coeff . "\n";
   }
   print $fh ");\n";
 }

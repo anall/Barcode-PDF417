@@ -9,7 +9,7 @@ configure_requires:
   Module::Build: '0'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.133380'
-license: artistic_2
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -21,5 +21,5 @@ provides:
   Barcode::PDF417::PP:
     file: lib/Barcode/PDF417/PP.pm
 resources:
-  license: http://www.perlfoundation.org/artistic_license_2_0
+  license: http://dev.perl.org/licenses/
 version: '0.01'
