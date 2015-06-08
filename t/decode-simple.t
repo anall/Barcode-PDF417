@@ -29,6 +29,15 @@ my $dir = tempdir( CLEANUP => $ENV{TEST_KEEP_FILES} ? 0 : 1 );
 my $fileId = 0;
 diag("dir is: $dir") if $ENV{TEST_KEEP_FILES};
 
+sub mangle($$$) {
+  my ($d,$r,$c) = @_;
+  my @tmp = split(//,$d->[$r]);
+  my $tmp = $tmp[$c];
+  $tmp[$c] = $tmp[$c+1];
+  $tmp[$c+1] = $tmp;
+  $d->[$r] = join('',@tmp);
+}
+
 sub confirm($$;$) {
   my ($d,$expected,$descr) = @_;
   my $wide = sum( split(//,$d->[0]) );
@@ -76,7 +85,7 @@ sub confirm($$;$) {
   }
 }
 
-plan tests => 2;
+plan tests => 3;
 
 my $n = 20 * 900**5 + 32 * 900**4 + 48 * 900**3 + 900**2 + 900**1;
 my $parts = Barcode::PDF417::PP::_compact_number($n);
@@ -85,3 +94,12 @@ my $data;
 
 confirm(Barcode::PDF417::PP::_build_symbol(\@out,4+  2,2,1),$n, "ec 1 $n");
 confirm(Barcode::PDF417::PP::_build_symbol(\@out,2+ 64,4,7),$n, "ec 7 $n");
+
+{
+  my $sym = Barcode::PDF417::PP::_build_symbol(\@out,2+ 64,4,7);
+  mangle($sym,1,20);
+  mangle($sym,2,20);
+  mangle($sym,3,20);
+  mangle($sym,4,20);
+  confirm($sym,$n, "ec 7 mangled $n");
+}
