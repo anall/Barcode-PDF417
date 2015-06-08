@@ -87,19 +87,27 @@ sub confirm($$;$) {
 
 plan tests => 3;
 
-my $n = 20 * 900**5 + 32 * 900**4 + 48 * 900**3 + 900**2 + 900**1;
-my $parts = Barcode::PDF417::PP::_compact_number($n);
-my @out = ( scalar(@$parts)+1,@$parts );
-my $data;
-
-confirm(Barcode::PDF417::PP::_build_symbol(\@out,4+  2,2,1),$n, "ec 1 $n");
-confirm(Barcode::PDF417::PP::_build_symbol(\@out,2+ 64,4,7),$n, "ec 7 $n");
-
 {
-  my $sym = Barcode::PDF417::PP::_build_symbol(\@out,2+ 64,4,7);
-  mangle($sym,1,20);
-  mangle($sym,2,20);
-  mangle($sym,3,20);
-  mangle($sym,4,20);
-  confirm($sym,$n, "ec 7 mangled $n");
+  my $n = 20 * 900**5 + 32 * 900**4 + 48 * 900**3 + 900**2 + 900**1;
+  my $parts = Barcode::PDF417::PP::_compact_number($n);
+
+  confirm(Barcode::PDF417::PP::_build_symbol($parts,6,2,1),$n, "ec 1 $n");
+  confirm(Barcode::PDF417::PP::_build_symbol($parts,4,6,1),$n, "ec 1 $n");
+}
+#  confirm(Barcode::PDF417::PP::_build_symbol(\@out,2+ 64,4,7),$n, "ec 7 $n");
+#
+#  {
+#    my $sym = Barcode::PDF417::PP::_build_symbol(\@out,2+ 64,4,7);
+#    mangle($sym,1,20);
+#    mangle($sym,2,20);
+#    mangle($sym,3,20);
+#    mangle($sym,4,20);
+#    confirm($sym,$n, "ec 7 mangled $n");
+#  }
+#}
+#
+{
+  my $n = "123456789" x 4;
+  my $parts = Barcode::PDF417::PP::_compact_number($n);
+  confirm(Barcode::PDF417::PP::_build_symbol($parts,16,14,3),$n, "ec 1 $n");
 }

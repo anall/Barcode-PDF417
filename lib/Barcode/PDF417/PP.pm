@@ -16,9 +16,9 @@ sub _compact_number($) {
   while ( length($t) ) {
     my $tIn = substr($t,0,44);
     $t = length($t) > 44 ? substr($t,44) : ""; 
-    push @codewords, 902, @{_compact_number_raw($tIn)};
+    push @codewords, @{_compact_number_raw($tIn)};
   }
-  return \@codewords;
+  return [902,@codewords];
 }
 
 sub _compact_number_raw($) {
@@ -76,23 +76,39 @@ sub _row_codewords($$$$) {
   return ($lr,$rr);
 }
 
-sub _build_symbol($$$$) {
-  my ($codewords,$nR,$nC,$ec) = @_;
-  die "sanity: r $nR out of bounds\n" if $nR < 3 || $nR > 90;
-  die "sanity: c $nC out of bounds\n" if $nC < 1 || $nC > 30;
-  die "sanity: length not correct\n" if @$codewords != $codewords->[0];
-  
-  my $spaceNeeded = $codewords->[0] + 2**($ec+1);
-  die "sanity: insufficient space $spaceNeeded " . ($nR*$nC) . "\n" if $nR*$nC < $spaceNeeded;
+sub _measure_symbol($$$$) {
+  my ($r,$c,$ec,$m) = @_;
+  die "sanity: r $r out of bounds\n" if $r < 3 || $r > 90;
+  die "sanity: c $c out of bounds\n" if $c < 1 || $c > 30;
 
-  die "NOT IMPLEMENTED PADDING\n" if $nR*$nC > $spaceNeeded;
+  my $n = $c*$r - 2**($ec+1);
+  die "cannot fit EC\n" if $n < 0;
 
+  my $pad = $n-$m-1;
+  die "cannot fit code\n" if $pad < 0;
+
+  return ($n,$pad);
+}
+
+sub _pad_codewords($$$) {
+  my ($codewords, $n, $pads) = @_;
+  return [ $n, @$codewords, ( map { 900 } (1..$pads) ) ];
+}
+
+sub _final_codewords($$$$) {
+  my ($codewords,$r,$c,$ec) = @_;
+
+  my ($n,$pads) = _measure_symbol($r,$c,$ec,$#$codewords + 1);
+  $codewords = _pad_codewords($codewords,$n,$pads);
   my $ecWords = _ec_codewords($codewords,$ec);
 
-  die "sanity: invalid codeword(s) in codewords\n" if grep { $_ < 0 || $_ >= 929 } @$codewords;
-  die "sanity: invalid codeword(s) in error correction\n" if grep { $_ < 0 || $_ >= 929 } @$ecWords;
+  my @toPlace = ( @$codewords,@$ecWords );
+  return \@toPlace;
+}
 
-  my @toPlace = (@$codewords,@$ecWords);
+sub _build_symbol($$$$) {
+  my ($codewords,$nR,$nC,$ec) = @_;
+  my $toPlace = _final_codewords($codewords,$nR,$nC,$ec);
   my @outData;
   my $idx = 0;
   for ( my $r = 0; $r < $nR; ++$r ) {
@@ -101,12 +117,10 @@ sub _build_symbol($$$$) {
 
     my $rowData = $startSymbol . $Barcode::PDF417::PP_Tables::codewords[$lr][$k];
     for (my $c = 0; $c < $nC; ++$c ) {
-      die "sanity: $idx out of range\n" if $idx >= @toPlace;
-      $rowData .= $Barcode::PDF417::PP_Tables::codewords[$toPlace[$idx++]][$k];
+      $rowData .= $Barcode::PDF417::PP_Tables::codewords[$toPlace->[$idx++]][$k];
     }
     push @outData, $rowData . $Barcode::PDF417::PP_Tables::codewords[$rr][$k] . $endSymbol;
   }
-
   return \@outData;
 }
 
