@@ -27,6 +27,7 @@ sub _compact_number_raw($) {
     unless length($t) <= 44;
   $t = "1$t";
 
+  use bigint;
   my @codewords;
   while ($t != 0) { 
     unshift @codewords, $t % 900;
