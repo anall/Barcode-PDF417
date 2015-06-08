@@ -89,7 +89,7 @@ plan tests => 3;
 }
 
 {
-  my $n = "123456789" x 5;
+  my $n = "123456789" x 8;
   my $parts = Barcode::PDF417::PP::_compact_number($n);
   confirm(Barcode::PDF417::PP::_build_symbol($parts,16,18,7),$n, "ec 1 $n");
 }
