@@ -21,9 +21,6 @@ plan( skip_all => "decode tests are disabled" ) if $ENV{NO_DECODE_TEST};
 plan( skip_all => "ZXing missing, not running decode tests -- see t/decode-simple.t for info" ) unless -e 'java/core.jar' and -e 'java/javase.jar';
 plan( skip_all => "Java helper, not running decode tests -- see t/decode-simple.t for info" ) unless -e 'java/BarcodePDF417Decode.class';
 
-eval "use Image::Magick;";
-plan( skip_all => "Image::Magick missing, not running decode tests" ) if $@;
-
 my $dir = tempdir( CLEANUP => $ENV{TEST_KEEP_FILES} ? 0 : 1 );
 my $fileId = 0;
 diag("dir is: $dir") if $ENV{TEST_KEEP_FILES};
@@ -62,11 +59,7 @@ sub confirm($$;$) {
     print $fh "P5\n" . ($wide*$charMul+$sidePadding*2) . " " . ($tall*$lineMul+$sidePadding*2) . "\n255\n$data";
   }
 
-  {
-    my $p = Image::Magick->new;
-    $p->Read("$dir/tmp.pgm");
-    $p->Write("$dir/" . (++$fileId) . ".png");
-  }
+  system("pnmtopng $dir/tmp.pgm > $dir/" . (++$fileId) . ".png 2>/dev/null");
 
   my $result = `java -cp java:java/core.jar:java/javase.jar BarcodePDF417Decode $dir/$fileId.png`;
   my ($type,@data) = split(/\n/,$result);

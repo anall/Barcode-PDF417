@@ -1,7 +1,6 @@
 language: perl
 before_install:
   - ./java/install.sh
-  - sudo apt-get install perlmagick
 perl:
   - "5.20"
   - "5.18"
