@@ -1,6 +1,5 @@
 package Barcode::PDF417::PP;
 use Barcode::PDF417::PP_Tables;
-use Data::Dump qw(dump);
 
 use strict;
 use warnings;

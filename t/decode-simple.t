@@ -2,7 +2,6 @@
 use strict;
 use Test::More;
 use Test::Exception;
-use Data::Dumper;
 use List::Util qw(sum);
 use File::Temp qw( tempdir );
 
