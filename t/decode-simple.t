@@ -4,6 +4,7 @@ use Test::More;
 use Test::Exception;
 use List::Util qw(sum);
 use File::Temp qw( tempdir );
+use IO::File;
 
 use Barcode::PDF417::PP;
 
