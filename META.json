@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.133380",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -22,7 +22,7 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0"
+            "Module::Build" : "0.4003"
          }
       }
    },
@@ -33,12 +33,15 @@
       },
       "Barcode::PDF417::PP" : {
          "file" : "lib/Barcode/PDF417/PP.pm"
+      },
+      "Barcode::PDF417::PP_Tables" : {
+         "file" : "lib/Barcode/PDF417/PP_Tables.pm"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://dev.perl.org/licenses/"
+         "http://www.perlfoundation.org/artistic_license_2_0"
       ]
    },
    "version" : "0.01"

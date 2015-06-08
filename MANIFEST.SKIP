@@ -72,6 +72,7 @@
 # Avoid archives of this distribution
 \bBarcode-PDF417-[\d\.\_]+
 
+^xt/
 java/core.jar
 java/javase.jar
 java/BarcodePDF417Decode.class

@@ -5,7 +5,7 @@ use Module::Build;
 
 my $builder = Module::Build->new(
     module_name         => 'Barcode::PDF417',
-    license             => 'perl',
+    license             => 'artistic_2',
     dist_author         => q{Andrea Nall <anall@andreanall.com>},
     dist_version_from   => 'lib/Barcode/PDF417.pm',
     release_status      => 'stable',
