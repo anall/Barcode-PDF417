@@ -13,10 +13,10 @@ my $builder = Module::Build->new(
         'Module::Build' => '0.4003',
     },
     build_requires => {
+    },
+    requires => { # FIXME: These should only be in build_requires
         'Test::More' => 0,
         'Test::Exception' => 0,
-    },
-    requires => {
         #'ABC'              => 1.6,
         #'Foo::Bar::Module' => 5.0401,
     },

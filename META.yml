@@ -2,9 +2,7 @@
 abstract: 'The great new Barcode::PDF417!'
 author:
   - 'Andrea Nall <anall@andreanall.com>'
-build_requires:
-  Test::Exception: '0'
-  Test::More: '0'
+build_requires: {}
 configure_requires:
   Module::Build: '0.4003'
 dynamic_config: 1
@@ -22,6 +20,9 @@ provides:
     file: lib/Barcode/PDF417/PP.pm
   Barcode::PDF417::PP_Tables:
     file: lib/Barcode/PDF417/PP_Tables.pm
+requires:
+  Test::Exception: '0'
+  Test::More: '0'
 resources:
   license: http://www.perlfoundation.org/artistic_license_2_0
 version: '0.01'

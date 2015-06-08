@@ -14,15 +14,15 @@
    },
    "name" : "Barcode-PDF417",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Test::Exception" : "0",
-            "Test::More" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
             "Module::Build" : "0.4003"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0"
          }
       }
    },
