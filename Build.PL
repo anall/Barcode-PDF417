@@ -17,6 +17,7 @@ my $builder = Module::Build->new(
     requires => { # FIXME: These should only be in build_requires
         'Test::More' => 0,
         'Test::Exception' => 0,
+        'IO::File' => 0,
         #'ABC'              => 1.6,
         #'Foo::Bar::Module' => 5.0401,
     },

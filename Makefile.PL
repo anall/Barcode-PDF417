@@ -5,6 +5,7 @@ WriteMakefile
   'NAME' => 'Barcode::PDF417',
   'VERSION_FROM' => 'lib/Barcode/PDF417.pm',
   'PREREQ_PM' => {
+                   'IO::File' => 0,
                    'Test::Exception' => 0,
                    'Test::More' => 0
                  },

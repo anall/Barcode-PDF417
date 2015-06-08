@@ -21,6 +21,7 @@ provides:
   Barcode::PDF417::PP_Tables:
     file: lib/Barcode/PDF417/PP_Tables.pm
 requires:
+  IO::File: '0'
   Test::Exception: '0'
   Test::More: '0'
 resources:
