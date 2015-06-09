@@ -14,3 +14,4 @@ throws_ok { Barcode::PDF417::PP::_ec_codewords([2,1],-1) } qr/invalid level/, "i
 
 is_deeply( Barcode::PDF417::PP::_ec_codewords([5,453,178,121,239],1), [452,327,657,619], "sample Annex Q" );
 
+# FIXME: Add test for 0 ec branch

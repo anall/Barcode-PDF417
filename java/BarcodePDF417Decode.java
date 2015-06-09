@@ -47,6 +47,8 @@ public final class BarcodePDF417Decode {
   public static void main(String[] args) throws Exception {
     Map<DecodeHintType, Object> hints = new EnumMap<>(DecodeHintType.class);
     hints.put(DecodeHintType.POSSIBLE_FORMATS, Arrays.asList(BarcodeFormat.PDF_417));
+    hints.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);
+    hints.put(DecodeHintType.PURE_BARCODE, Boolean.TRUE);
 
     if (args.length != 1) {
       System.out.println("FAIL: No arguments");

@@ -71,8 +71,8 @@ sub _row_codewords($$$$) {
     $k == 0 ? ($c - 1) :
     $k == 1 ? int( ($r-1)/3 ) :
               ( ($s * 3) + ($r-1) % 3 ) );
-#  die "sanity: $lr out of range\n" if $lr < 0;
-#  die "sanity: $rr out of range\n" if $rr < 0;
+  die "sanity: $lr out of range\n" if $lr < 0 or $lr >= 989;
+  die "sanity: $rr out of range\n" if $rr < 0 or $lr >= 989;
   return ($lr,$rr);
 }
 

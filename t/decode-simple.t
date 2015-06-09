@@ -39,8 +39,8 @@ sub confirm($$;$) {
   my ($d,$expected,$descr) = @_;
   my $wide = sum( split(//,$d->[0]) );
   my $sidePadding = 10;
-  my $charMul = 3;
-  my $lineMul = 6;
+  my $charMul = 5;
+  my $lineMul = $charMul * 3;
 
   my $tall = @$d;
   my $data = ( ("\xFF" x ($wide*$charMul+$sidePadding*2)) ) x $sidePadding;
@@ -78,7 +78,7 @@ sub confirm($$;$) {
   }
 }
 
-plan tests => 3;
+plan tests => 5;
 
 {
   my $n = 20 * 900**5 + 32 * 900**4 + 48 * 900**3 + 900**2 + 900**1;
@@ -92,4 +92,11 @@ plan tests => 3;
   my $n = "123456789" x 8;
   my $parts = Barcode::PDF417::PP::_compact_number($n);
   confirm(Barcode::PDF417::PP::_build_symbol($parts,16,18,7),$n, "ec 1 $n");
+  confirm(Barcode::PDF417::PP::_build_symbol($parts,32,9,7),$n, "ec 1 $n");
+}
+
+{
+  my $partsA = Barcode::PDF417::PP::_compact_number("1234");
+  my $partsB = Barcode::PDF417::PP::_compact_number("9876");
+  confirm(Barcode::PDF417::PP::_build_symbol([@$partsA, @$partsB],10,10,5),"12349876", "two number pairs");
 }
