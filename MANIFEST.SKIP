@@ -72,6 +72,7 @@
 # Avoid archives of this distribution
 \bBarcode-PDF417-[\d\.\_]+
 
+.travis.yml
 ^xt/
 java/core.jar
 java/javase.jar

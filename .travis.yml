@@ -1,6 +1,6 @@
 language: perl
 before_install:
-  - ./java/install.sh
+  - cd java && ./install.sh
 perl:
   - "5.20"
   - "5.18"

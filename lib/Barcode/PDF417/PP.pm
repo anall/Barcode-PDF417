@@ -7,9 +7,87 @@ use warnings;
 my $startSymbol = "81111113";
 my $endSymbol   = "711311121";
 
-sub _compact_number($) {
-  my ($t) = $_[0];
+my $tc_al = 0xFA;
+my $tc_as = 0xFB;
+my $tc_ll = 0xFC;
+my $tc_ml = 0xFD;
+my $tc_pl = 0xFE;
+my $tc_ps = 0xFF;
+
+my @tc_Alpha = ( map { chr($_) } ( ( 65 ..  90), 32,
+  $tc_ll, $tc_ml, $tc_ps ) );
+my @tc_Lower = ( map { chr($_) } ( ( 97 .. 122), 32,
+  $tc_as, $tc_ml, $tc_ps ) );
+my @tc_Mixed = ( map { chr($_) } ( (48..57),
+   38,  13,   9,  44,  58,  35,  45,  46,  36,  47,  43,  37,  42,  61,  94,
+   $tc_pl, 32, $tc_ll, $tc_al, $tc_ps ) );
+my @tc_Punct = ( map { chr($_) } (
+   59,  60,  62,  64,  91,  92,  93,  95,  96, 126,  33,  13,   9,  44,  58,
+   10,  45,  46,  36,  47,  34, 124,  42,  40,  41,  63, 123, 125,  39,
+   $tc_al ) );
+
+my $tc_AlphaRegex = quotemeta join("",grep { ord($_) < $tc_al } @tc_Alpha);
+my $tc_LowerRegex = quotemeta join("",grep { ord($_) < $tc_al } @tc_Lower);
+my $tc_MixedRegex = quotemeta join("",grep { ord($_) < $tc_al } @tc_Mixed);
+my $tc_PunctRegex = quotemeta join("",grep { ord($_) < $tc_al } @tc_Punct);
+
+my $tc_RegexFast = qr/\G(?:
+  (?<al>[$tc_AlphaRegex]+)|
+  (?<ll>[$tc_LowerRegex]+)|
+  (?<ml>[$tc_MixedRegex]+)|
+  (?<ps>[$tc_PunctRegex])
+)/x;
+
+my $tc_Regex = qr/\G(?:
+  (?<al>[$tc_AlphaRegex]+)|
+  (?<ll>[$tc_LowerRegex]+)|
+  (?<pl>(?<=[$tc_MixedRegex])[$tc_PunctRegex]{2,}(?=[$tc_AlphaRegex]|$))| # This is pretty much free, as we just need <pl> but require 2 to prevent useless switching.
+  (?<pl>(?<=[$tc_MixedRegex])[$tc_PunctRegex]{3,})| # We need <pl>...<al><return> -- 3 characters take up 6 for this, v.s. 6 for <ps>.
+  (?<ml>[$tc_MixedRegex]+)|
+  (?<pl>[$tc_PunctRegex]{3,}(?=[$tc_AlphaRegex]|$))| # We need <ml><pl>...<al> -- 3 characters takes up 6 v.s. 6 for <ps>.
+  (?<pl>[$tc_PunctRegex]{4,})| # We need <ml><pl>...<al><return> -- 3 characters takes up 7 v.s. 8 for <ps>
+  (?<ps>[$tc_PunctRegex])
+)/x;
+
+sub _preprocess_text($;$) {
+  my ($t,$fast) = @_;
+  my @out;
+  my $regex = $fast ? $tc_RegexFast : $tc_Regex;
+  while ( $t =~ m/$regex/gc ) {
+    #die "sanity: got wrong number of matches\n" if keys %+ != 1;
+    my ($mode,$data) = %+; # I know this is horrible.
+    if ( $mode eq 'pl' and @out and $out[-1][0] =~ m/ps|ml/ and $out[-1][1] =~ m/^[$tc_PunctRegex]$/ ) {
+      # If our previous is ml or ps, and can be encoded with PunctRegex, and we are going into pl -- switch the current one to pl
+      #  The cost is the same.
+      $out[-1][0] = $mode;
+      $out[-1][1] .= $data;
+    } else {
+      push @out, [$mode,$data]; # I know this is horrible.
+    }
+  }
+  return undef if (pos($t)||0) ne length($t);
+  return \@out;
+}
+
+sub _preencode_text($;$) {
+  my ($t,$curMode) = @_;
+  
+}
+
+sub _compact_text($;$$$) {
+  my ($t,$latch,$curMode,$shiftFollows) = @_;
+  $latch //= 1;
+  $shiftFollows ||= 0;
+  my $preshift = $curMode;
+  my @out = ( $latch ? (900) : () );
+
+  return wantarray ? (\@out,$curMode) : \@out;
+}
+
+sub _compact_number($;$) {
+  my ($t,$latch) = @_;
   die "sanity: '$t' is not numeric" unless $t =~ m/^\d+$/;
+  $latch //= 1;
 
   my @codewords;
   while ( length($t) ) {
@@ -17,7 +95,7 @@ sub _compact_number($) {
     $t = length($t) > 44 ? substr($t,44) : ""; 
     push @codewords, @{_compact_number_raw($tIn)};
   }
-  return [902,@codewords];
+  return [ ( $latch ? (902) : () ) ,@codewords];
 }
 
 sub _compact_number_raw($) {

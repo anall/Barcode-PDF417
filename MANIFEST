@@ -13,6 +13,11 @@ data/codewords
 data/coeff
 tools/generate.pl
 java/BarcodePDF417Decode.java
-t/number-compaction.t
+java/install.sh
 t/error-correction.t
+t/padding.t
+t/compaction-number.t
+t/compaction-text.t
+t/final-codewords.t
 t/decode-simple.t
+
