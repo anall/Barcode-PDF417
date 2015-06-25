@@ -36,7 +36,10 @@ my %tc_Punct = ( map { $tc_Punct[$_] => $_ } ( 0 .. $#tc_Punct ) );
 my %tc_ModePoint = (
   al => \%tc_Alpha,
   as => \%tc_Alpha,
-  
+  ll => \%tc_Lower,
+  ml => \%tc_Mixed,
+  pl => \%tc_Punct,
+  ps => \%tc_Punct,
 );
 
 my $tc_AlphaRegex = quotemeta join("",grep { ord($_) < 0xF0 } @tc_Alpha);
@@ -76,6 +79,8 @@ sub _preprocess_text($;$) {
       #  The cost is the same.
       $out[-1][0] = $mode;
       $out[-1][1] .= $data;
+    } elsif ( $mode =~ m/^.s$/ ) {
+      push @out, [$mode,$_] foreach split(//,$data); # I know this is horrible.
     } else {
       push @out, [$mode,$data]; # I know this is horrible.
     }
@@ -91,14 +96,15 @@ sub _preencode_text($;$$) {
   $curMode //= $tc_modes{al};
   my $plan = _preprocess_text($t,$fast // 0);
 
-  my @out;
+  my $out;
   foreach my $item ( @$plan ) {
     my $newMode = $tc_modes{$item->[0]};
-    push @out, $newMode if $curMode ne $newMode;
-    foreach my $char ( split(//,$item->[1]) ) {
-    }
+    $out .= chr($newMode) if $curMode ne $newMode;
+    $curMode = $newMode if $newMode != $tc_modes{as} and $newMode != $tc_modes{ps};
+
+    $out .= $item->[1];
   }
-  return \@out;   
+  return $out;
 }
 
 sub _compact_text($;$$$) {
