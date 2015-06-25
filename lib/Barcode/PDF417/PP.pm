@@ -99,7 +99,16 @@ sub _preencode_text($;$$) {
   my $out;
   foreach my $item ( @$plan ) {
     my $newMode = $tc_modes{$item->[0]};
-    $out .= chr($newMode) if $curMode ne $newMode;
+    if ( $curMode ne $newMode ) {
+        if ( $newMode == $tc_modes{al} ) {
+            $out .= chr($tc_modes{ps}) if !( $curMode == $tc_modes{ml} or $curMode == $tc_modes{pl} or $curMode == $tc_modes{ps} );
+        } elsif ( $newMode == $tc_modes{pl} ) {
+            $out .= chr($tc_modes{ml}) if $curMode != $tc_modes{ml};
+        } elsif  ( $curMode == $tc_modes{pl} or $curMode == $tc_modes{ps} ) {
+            $out .= chr($tc_modes{al}) if $newMode != $tc_modes{al};
+        }
+        $out .= chr($newMode);
+    }
     $curMode = $newMode if $newMode != $tc_modes{as} and $newMode != $tc_modes{ps};
 
     $out .= $item->[1];

@@ -77,11 +77,25 @@ subtest "preencode", sub {
     my $pl = chr(0xFE);
     my $ps = chr(0xFF);
 
-    is(Barcode::PDF417::PP::_preencode_text("Hello World"), "H${ll}ello ${as}World");
-    is(Barcode::PDF417::PP::_preencode_text("I have \$200,000?"), "I ${ll}have ${ml}\$200,000${ps}?");
-    is(Barcode::PDF417::PP::_preencode_text("I have \$200,000?!?"), "I ${ll}have ${ml}\$200,000${pl}?!?");
-    is(Barcode::PDF417::PP::_preencode_text("xOMg"), "${ll}x${as}O${as}Mg");
-    is(Barcode::PDF417::PP::_preencode_text("xOMG"), "${ll}x${al}OMG");
+    my $pre_and_fmt = sub {
+        my $x = Barcode::PDF417::PP::_preencode_text($_[0]);
+        $x =~ s/$al/<al>/g;
+        $x =~ s/$as/<as>/g;
+        $x =~ s/$ll/<ll>/g;
+        $x =~ s/$ml/<ml>/g;
+        $x =~ s/$pl/<pl>/g;
+        $x =~ s/$ps/<ps>/g;
+        return $x;
+    };
+
+    is($pre_and_fmt->("Hello World"), "H<ll>ello <as>World");
+    is($pre_and_fmt->("I have \$200,000?"), "I <ll>have <ml>\$200,000<ps>?");
+    is($pre_and_fmt->("I have \$200,000?!?"), "I <ll>have <ml>\$200,000<pl>?!?");
+    is($pre_and_fmt->("xOMg"), "<ll>x<as>O<as>Mg");
+    is($pre_and_fmt->("xOMG"), "<ll>x<ps><al>OMG");
+    is($pre_and_fmt->("1OM"), "<ml>1<al>OM");
+    is($pre_and_fmt->("???OM"), "<ml><pl>???<al>OM");
+    is($pre_and_fmt->("????om"), "<ml><pl>????<al><ll>om");
 };
 
 done_testing();
