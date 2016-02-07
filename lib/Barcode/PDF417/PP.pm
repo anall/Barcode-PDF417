@@ -263,6 +263,11 @@ sub _final_codewords($$$$) {
 sub _build_symbol($$$$) {
   my ($codewords,$nR,$nC,$ec) = @_;
   my $toPlace = _final_codewords($codewords,$nR,$nC,$ec);
+  return _build_symbol_raw($toPlace,$nR,$nC,$ec);
+}
+
+sub _build_symbol_raw($$$$) {
+  my ($toPlace,$nR,$nC,$ec) = @_;
   my @outData;
   my $idx = 0;
   for ( my $r = 0; $r < $nR; ++$r ) {

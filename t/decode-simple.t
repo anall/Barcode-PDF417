@@ -38,7 +38,15 @@ sub mangle($$$) {
 }
 
 sub confirm($$;$) {
-  my ($d,$expected,$descr) = @_;
+  my ($inData,$expected,$descr) = @_;
+
+  my ($d,$outCodewords);
+  {
+    my ($codewords,$nR,$nC,$ec) = @$inData;
+    $outCodewords = Barcode::PDF417::PP::_final_codewords($codewords,$nR,$nC,$ec);
+    $d = Barcode::PDF417::PP::_build_symbol_raw($outCodewords,$nR,$nC,$ec);
+  }
+
   my $wide = sum( split(//,$d->[0]) );
   my $sidePadding = 10;
   my $charMul = 5;
@@ -65,15 +73,18 @@ sub confirm($$;$) {
   system("pnmtopng $dir/tmp.pgm > $dir/" . (++$fileId) . ".png 2>/dev/null");
 
   my $result = `java -cp java/lib:java/core.jar:java/javase.jar BarcodePDF417Decode $dir/$fileId.png`;
-  my ($type,$ecLevel,$codewords,$oData) = split(/\n/,$result);
+  my ($type,$ecLevel,$oCodewords,$oData) = split(/\n/,$result);
 
-  my $bin = pack("H*",$oData);
-  $descr ||= "code: $expected";
+  my $eData = unpack("H*",$expected);
+  $descr ||= "code: $eData";
+
+  my $eCodewords = join(" ",@$outCodewords) . " ";
 
   subtest $descr => sub {
-    plan tests => 2;
+    plan tests => 3;
     is( $type, "PDF_417", "type");
-    is( $bin, $expected, "data");
+    is( $oCodewords, $eCodewords, "decoded codewords");
+    is( $oData, $eData, "decoded data");
   }
 }
 
@@ -83,22 +94,22 @@ plan tests => 7;
   my $n = 20 * 900**5 + 32 * 900**4 + 48 * 900**3 + 900**2 + 900**1;
   my $parts = Barcode::PDF417::PP::_compact_number($n);
 
-  confirm(Barcode::PDF417::PP::_build_symbol($parts,6,2,1),$n, "ec 1 $n");
-  confirm(Barcode::PDF417::PP::_build_symbol($parts,4,6,3),$n, "ec 1 $n");
+  confirm([$parts,6,2,1],$n, "ec 1 $n");
+  confirm([$parts,4,6,3],$n, "ec 1 $n");
 }
 
 {
   my $n = "123456789" x 8;
   my $parts = Barcode::PDF417::PP::_compact_number($n);
-  confirm(Barcode::PDF417::PP::_build_symbol($parts,16,18,7),$n, "ec 1 $n");
-  confirm(Barcode::PDF417::PP::_build_symbol($parts,32,9,7),$n, "ec 1 $n");
+  confirm([$parts,16,18,7],$n, "ec 1 $n");
+  confirm([$parts,32,9,7],$n, "ec 1 $n");
 }
 
 {
   my $partsA = Barcode::PDF417::PP::_compact_number("1234");
   my $partsB = Barcode::PDF417::PP::_compact_number("9876");
-  confirm(Barcode::PDF417::PP::_build_symbol([@$partsA, @$partsB],10,10,5),"12349876", "two number pairs");
+  confirm([[@$partsA, @$partsB],10,10,5],"12349876", "two number pairs");
 }
 
-confirm(Barcode::PDF417::PP::_build_symbol(Barcode::PDF417::PP::_compact_text("PDF417"),10,10,5),"PDF417", "PDF417 w/ latch");
-confirm(Barcode::PDF417::PP::_build_symbol(Barcode::PDF417::PP::_compact_text("PDF417",0),10,10,5),"PDF417", "PDF417 w/o latch");
+confirm([Barcode::PDF417::PP::_compact_text("PDF417"  ),10,10,5],"PDF417", "PDF417 w/ latch");
+confirm([Barcode::PDF417::PP::_compact_text("PDF417",0),10,10,5],"PDF417", "PDF417 w/o latch");
