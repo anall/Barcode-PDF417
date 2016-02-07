@@ -102,7 +102,7 @@ sub _preencode_text($;$$) {
     my $newMode = $tc_modes{$item->[0]};
     if ( $curMode ne $newMode ) {
         if ( $newMode == $tc_modes{al} ) {
-            $out .= chr($tc_modes{ps}) if !( $curMode == $tc_modes{ml} or $curMode == $tc_modes{pl} );
+            $out .= chr($tc_modes{ml}) if !( $curMode == $tc_modes{ml} or $curMode == $tc_modes{pl} );
         } elsif ( $newMode == $tc_modes{pl} ) {
             $out .= chr($tc_modes{ml}) if $curMode != $tc_modes{ml};
         } elsif  ( $curMode == $tc_modes{pl} ) {

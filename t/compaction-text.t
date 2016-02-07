@@ -101,7 +101,7 @@ subtest "preencode", sub {
     is($pre_and_fmt->("I have \$200,000?"), "I <ll>have <ml>\$200,000<ps>?");
     is($pre_and_fmt->("I have \$200,000?!?"), "I <ll>have <ml>\$200,000<pl>?!?");
     is($pre_and_fmt->("xOMg"), "<ll>x<as>O<as>Mg");
-    is($pre_and_fmt->("xOMG"), "<ll>x<ps><al>OMG");
+    is($pre_and_fmt->("xOMG"), "<ll>x<ml><al>OMG");
     is($pre_and_fmt->("1OM"), "<ml>1<al>OM");
     is($pre_and_fmt->("???OM"), "<ml><pl>???<al>OM");
     is($pre_and_fmt->("????om"), "<ml><pl>????<al><ll>om");
@@ -109,7 +109,7 @@ subtest "preencode", sub {
 
     # Let's try pre-existing
     is($pre_and_fmt->("PDF417",undef,$tc_ml), "<al>PDF<ml>417");
-    is($pre_and_fmt->("PDF417",undef,$tc_ll), "<ps><al>PDF<ml>417");
+    is($pre_and_fmt->("PDF417",undef,$tc_ll), "<ml><al>PDF<ml>417");
 
     is($pre_and_fmt->("PDF417!!!"), "PDF<ml>417<pl>!!!");
     is($pre_and_fmt->("PDF417!"), "PDF<ml>417<ps>!");
