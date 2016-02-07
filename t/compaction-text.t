@@ -2,7 +2,7 @@
 use strict;
 use List::Util qw(sum);
 
-use Test::More tests => 3;
+use Test::More tests => 4;
 use Test::Exception;
 
 use Barcode::PDF417::PP;
@@ -70,8 +70,14 @@ subtest "preprocess", sub {
   test_preprocess('Mixed Case 4', 'Hello WWWWorld', [ ['al','H'], ['ll','ello '], ['al','WWWW'],['ll','orld'] ], overhead => 4);
 };
 
+subtest "preprocess, no overhead", sub {
+  plan tests => 2;
+  is_deeply( Barcode::PDF417::PP::_preprocess_text("111,,,]"),[ ['ml','111,,,'], ['ps',']'] ]);
+  is_deeply( Barcode::PDF417::PP::_preprocess_text("!!!!11"), [ ['pl','!!!!'], ['ml','11'] ]);
+};
+
 subtest "preencode", sub {
-    plan tests => 12;
+    plan tests => 16;
 
     my $c_al = chr($tc_al);
     my $c_as = chr($tc_as);
@@ -106,12 +112,18 @@ subtest "preencode", sub {
     is($pre_and_fmt->("PDF417",undef,$tc_ll), "<ps><al>PDF<ml>417");
 
     is($pre_and_fmt->("PDF417!!!"), "PDF<ml>417<pl>!!!");
+    is($pre_and_fmt->("PDF417!"), "PDF<ml>417<ps>!");
+
+    is($pre_and_fmt->("!!!!aa"), "<ml><pl>!!!!<al><ll>aa");
+    is($pre_and_fmt->("!!!!AA"), "<ml><pl>!!!!<al>AA");
+    is($pre_and_fmt->("!!!!11"), "<ml><pl>!!!!<al><ml>11");
 };
 
 subtest "preencode", sub {
-    plan tests => 3;
+    plan tests => 4;
 
     is_deeply( scalar(Barcode::PDF417::PP::_compact_text("PDF417",0)),[453,178,121,239], "PDF417 -- from manual");
     is_deeply( scalar(Barcode::PDF417::PP::_compact_text("PDF41",0)),[453,178,121], "PDF41");
     is_deeply( scalar(Barcode::PDF417::PP::_compact_text("PDF417!!!",0)),[453,178,121,235,310,329],"PDF<ml>417<pl>!!!");
+    is_deeply( scalar(Barcode::PDF417::PP::_compact_text("PDF417!",0)),[453,178,121,239,329],"PDF<ml>417<pl>!!!");
 };

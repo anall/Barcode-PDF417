@@ -102,11 +102,11 @@ sub _preencode_text($;$$) {
     my $newMode = $tc_modes{$item->[0]};
     if ( $curMode ne $newMode ) {
         if ( $newMode == $tc_modes{al} ) {
-            $out .= chr($tc_modes{ps}) if !( $curMode == $tc_modes{ml} or $curMode == $tc_modes{pl} or $curMode == $tc_modes{ps} );
+            $out .= chr($tc_modes{ps}) if !( $curMode == $tc_modes{ml} or $curMode == $tc_modes{pl} );
         } elsif ( $newMode == $tc_modes{pl} ) {
             $out .= chr($tc_modes{ml}) if $curMode != $tc_modes{ml};
-        } elsif  ( $curMode == $tc_modes{pl} or $curMode == $tc_modes{ps} ) {
-            $out .= chr($tc_modes{al}) if $newMode != $tc_modes{al};
+        } elsif  ( $curMode == $tc_modes{pl} ) {
+            $out .= chr($tc_modes{al});
         }
         $out .= chr($newMode);
     }
@@ -116,6 +116,13 @@ sub _preencode_text($;$$) {
   }
   return $out;
 }
+
+my %candModeSecond = (
+    $tc_modes{al} => $tc_modes{ps},
+    $tc_modes{ll} => $tc_modes{ps},
+    $tc_modes{ml} => $tc_modes{ps},
+    $tc_modes{pl} => $tc_modes{al},
+);
 
 sub _compact_text($;$$$$) {
   my ($t,$latch,$curMode,$shiftFollows,$fast) = @_;
@@ -135,18 +142,11 @@ sub _compact_text($;$$$$) {
     if ( $second eq '' ) { # Final
       my $candMode = ( $first =~ m/[$tc_ModeSwitch]/ ) ? $first : $curMode;
       # FIXME: Some of these should never actually happen
-      $second = chr(
-        ( $candMode == $tc_modes{al} ) ? $tc_modes{ps} :
-        ( $candMode == $tc_modes{as} ) ? $tc_modes{ps} : # Had to come from 'll', so ps is always valid
-        ( $candMode == $tc_modes{ll} ) ? $tc_modes{ps} :
-        ( $candMode == $tc_modes{ml} ) ? $tc_modes{ps} :
-        ( $candMode == $tc_modes{pl} ) ? $tc_modes{al} :
-        ( $candMode == $tc_modes{ps} ) ? $tc_modes{ps} :
-        die "sanity: uknown\n");
+      $second = chr( $candModeSecond{$candMode} ) // die "sanity: uknown";
     }
     my $codepoint = 0;
     foreach my $chr ( $first, $second ) {
-      $codepoint = $codepoint*30 + ( $tc_ModePoint{$curMode || $shiftMode}{$chr} // die "sanity: " . ord($chr) . " $curMode $shiftMode" );
+      $codepoint = $codepoint*30 + ( $tc_ModePoint{$shiftMode // $curMode}{$chr} // die "sanity: " . ord($chr) . " $curMode $shiftMode" );
       $shiftMode = undef;
       if ( ord($chr) == $tc_modes{as} || ord($chr) == $tc_modes{ps} ) {
         $shiftMode = ord($chr);
