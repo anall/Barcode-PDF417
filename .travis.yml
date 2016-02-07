@@ -1,6 +1,10 @@
 language: perl
 before_install:
+  - if [[ -e $HOME/.cache ]]; then cp $HOME/.cache/*.jar java; fi
   - (cd java && ./install.sh)
+before_cache:
+  - mkdir -p $HOME/.cache
+  - cp java/*.jar $HOME/.cache
 perl:
   - "5.22"
   - "5.20"
