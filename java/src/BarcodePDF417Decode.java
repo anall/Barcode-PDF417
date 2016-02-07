@@ -31,6 +31,7 @@ import com.google.zxing.MultiFormatReader;
 import com.google.zxing.NotFoundException;
 import com.google.zxing.Result;
 import com.google.zxing.ResultPoint;
+import com.google.zxing.ResultMetadataType;
 
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.multi.GenericMultipleBarcodeReader;
@@ -79,14 +80,10 @@ public final class BarcodePDF417Decode {
 
     Result result = results[0];
     System.out.println( result.getBarcodeFormat() );
+    System.out.println( result.getResultMetadata().get(ResultMetadataType.ERROR_CORRECTION_LEVEL) );
     byte bytes[] = result.getText().getBytes();
-    int i = 0;
     for ( byte b : bytes ) {
-      System.out.format("%d ",b);
-      if ( ++i > 32 ) {
-        System.out.print("\n");
-        i = 0;
-      }
+      System.out.format("%02x",b);
     }
     System.out.print("\n");
   }
