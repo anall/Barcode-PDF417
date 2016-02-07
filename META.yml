@@ -2,11 +2,14 @@
 abstract: 'The great new Barcode::PDF417!'
 author:
   - 'Andrea Nall <anall@andreanall.com>'
-build_requires: {}
+build_requires:
+  IO::File: '0'
+  Test::Exception: '0'
+  Test::More: '0'
 configure_requires:
-  Module::Build: '0.4003'
+  Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150005'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,10 +23,7 @@ provides:
     file: lib/Barcode/PDF417/PP.pm
   Barcode::PDF417::PP_Tables:
     file: lib/Barcode/PDF417/PP_Tables.pm
-requires:
-  IO::File: '0'
-  Test::Exception: '0'
-  Test::More: '0'
 resources:
-  license: http://www.perlfoundation.org/artistic_license_2_0
+  license: http://opensource.org/licenses/artistic-license-2.0.php
 version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

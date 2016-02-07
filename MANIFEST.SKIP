@@ -74,6 +74,11 @@
 
 .travis.yml
 ^xt/
-java/core.jar
-java/javase.jar
-java/BarcodePDF417Decode.class
+
+# Do not even include the java directory in the distribution
+java
+
+# Nor these
+data
+tools
+

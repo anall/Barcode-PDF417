@@ -4,7 +4,7 @@
       "Andrea Nall <anall@andreanall.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Module::Build version 0.4216",
    "license" : [
       "artistic_2"
    ],
@@ -16,10 +16,10 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.4003"
+            "Module::Build" : "0.4004"
          }
       },
-      "runtime" : {
+      "test" : {
          "requires" : {
             "IO::File" : "0",
             "Test::Exception" : "0",
@@ -42,8 +42,9 @@
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://www.perlfoundation.org/artistic_license_2_0"
+         "http://opensource.org/licenses/artistic-license-2.0.php"
       ]
    },
-   "version" : "0.01"
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
 }

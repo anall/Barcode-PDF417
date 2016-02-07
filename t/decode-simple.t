@@ -14,12 +14,10 @@ use Barcode::PDF417::PP;
 #  If there is a bug in my encoding, there will likely be a bug in my *decoder*.
 
 # To use:
-#   Grab the latest core and javase JARs following the instructions at https://github.com/zxing/zxing/wiki/Getting-Started-Developing
-#    and put them in the 'java' directory.
-#
-#   Compile BarcodePDF417Decode.java with: javac -cp core.jar:javase.jar BarcodePDF417Decode.java
-
-plan( skip_all => "decode tests are disabled" ) if $ENV{NO_DECODE_TEST};
+#   cd to the 'java' directory and run 'install.sh'
+#   Please note, the java directory is not included in the distribution on CPAN, if you want to run
+#     these tests, please make sure you get the version from github.
+plan( skip_all => "decode tests are disabled" ) if $ENV{NO_DECODE_TEST} or ! -e 'java';
 plan( skip_all => "ZXing missing, not running decode tests -- see t/decode-simple.t for info" ) unless -e 'java/core.jar' and -e 'java/javase.jar';
 plan( skip_all => "Java helper missing, not running decode tests -- see t/decode-simple.t for info" ) unless -e 'java/lib/BarcodePDF417Decode.class';
 
