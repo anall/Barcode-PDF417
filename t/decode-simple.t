@@ -1,10 +1,11 @@
 #!/usr/bin/perl -w
 use strict;
-use Test::More;
-use Test::Exception;
 use List::Util qw(sum);
 use File::Temp qw( tempdir );
 use IO::File;
+
+use Test::More;
+use Test::Exception;
 
 use Barcode::PDF417::PP;
 
@@ -20,7 +21,8 @@ use Barcode::PDF417::PP;
 
 plan( skip_all => "decode tests are disabled" ) if $ENV{NO_DECODE_TEST};
 plan( skip_all => "ZXing missing, not running decode tests -- see t/decode-simple.t for info" ) unless -e 'java/core.jar' and -e 'java/javase.jar';
-plan( skip_all => "Java helper missing, not running decode tests -- see t/decode-simple.t for info" ) unless -e 'java/BarcodePDF417Decode.class';
+plan( skip_all => "Java helper missing, not running decode tests -- see t/decode-simple.t for info" ) unless -e 'java/lib/BarcodePDF417Decode.class';
+
 
 my $dir = tempdir( CLEANUP => $ENV{TEST_KEEP_FILES} ? 0 : 1 );
 my $fileId = 0;
@@ -62,13 +64,10 @@ sub confirm($$;$) {
 
   system("pnmtopng $dir/tmp.pgm > $dir/" . (++$fileId) . ".png 2>/dev/null");
 
-  my $result = `java -cp java:java/core.jar:java/javase.jar BarcodePDF417Decode $dir/$fileId.png`;
-  my ($type,@data) = split(/\n/,$result);
+  my $result = `java -cp java/lib:java/core.jar:java/javase.jar BarcodePDF417Decode $dir/$fileId.png`;
+  my ($type,$ecLevel,$codewords,$oData) = split(/\n/,$result);
 
-  my $bin;
-  foreach my $line (@data) {
-    $bin .= join('',map { chr($_ ) } split(/\s/,$line));
-  }
+  my $bin = pack("H*",$oData);
   $descr ||= "code: $expected";
 
   subtest $descr => sub {
@@ -78,7 +77,7 @@ sub confirm($$;$) {
   }
 }
 
-plan tests => 6;
+plan tests => 7;
 
 {
   my $n = 20 * 900**5 + 32 * 900**4 + 48 * 900**3 + 900**2 + 900**1;
@@ -101,4 +100,5 @@ plan tests => 6;
   confirm(Barcode::PDF417::PP::_build_symbol([@$partsA, @$partsB],10,10,5),"12349876", "two number pairs");
 }
 
-confirm(Barcode::PDF417::PP::_build_symbol(Barcode::PDF417::PP::_compact_text("PDF417"),10,10,5),"PDF417", "two number pairs");
+confirm(Barcode::PDF417::PP::_build_symbol(Barcode::PDF417::PP::_compact_text("PDF417"),10,10,5),"PDF417", "PDF417 w/ latch");
+confirm(Barcode::PDF417::PP::_build_symbol(Barcode::PDF417::PP::_compact_text("PDF417",0),10,10,5),"PDF417", "PDF417 w/o latch");
