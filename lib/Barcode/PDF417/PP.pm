@@ -7,29 +7,46 @@ use warnings;
 my $startSymbol = "81111113";
 my $endSymbol   = "711311121";
 
-my $tc_al = 0xFA;
-my $tc_as = 0xFB;
-my $tc_ll = 0xFC;
-my $tc_ml = 0xFD;
-my $tc_pl = 0xFE;
-my $tc_ps = 0xFF;
+my %tc_modes = (
+  al => 0xFA,
+  as => 0xFB,
+  ll => 0xFC,
+  ml => 0xFD,
+  pl => 0xFE,
+  ps => 0xFF
+);
 
 my @tc_Alpha = ( map { chr($_) } ( ( 65 ..  90), 32,
-  $tc_ll, $tc_ml, $tc_ps ) );
+  $tc_modes{ll}, $tc_modes{ml}, $tc_modes{ps} ) );
 my @tc_Lower = ( map { chr($_) } ( ( 97 .. 122), 32,
-  $tc_as, $tc_ml, $tc_ps ) );
+  $tc_modes{as}, $tc_modes{ml}, $tc_modes{ps} ) );
 my @tc_Mixed = ( map { chr($_) } ( (48..57),
    38,  13,   9,  44,  58,  35,  45,  46,  36,  47,  43,  37,  42,  61,  94,
-   $tc_pl, 32, $tc_ll, $tc_al, $tc_ps ) );
+   $tc_modes{pl}, 32, $tc_modes{ll}, $tc_modes{al}, $tc_modes{ps} ) );
 my @tc_Punct = ( map { chr($_) } (
    59,  60,  62,  64,  91,  92,  93,  95,  96, 126,  33,  13,   9,  44,  58,
    10,  45,  46,  36,  47,  34, 124,  42,  40,  41,  63, 123, 125,  39,
-   $tc_al ) );
+   $tc_modes{al} ) );
 
-my $tc_AlphaRegex = quotemeta join("",grep { ord($_) < $tc_al } @tc_Alpha);
-my $tc_LowerRegex = quotemeta join("",grep { ord($_) < $tc_al } @tc_Lower);
-my $tc_MixedRegex = quotemeta join("",grep { ord($_) < $tc_al } @tc_Mixed);
-my $tc_PunctRegex = quotemeta join("",grep { ord($_) < $tc_al } @tc_Punct);
+my %tc_Alpha = ( map { $tc_Alpha[$_] => $_ } ( 0 .. $#tc_Alpha ) );
+my %tc_Lower = ( map { $tc_Lower[$_] => $_ } ( 0 .. $#tc_Lower ) );
+my %tc_Mixed = ( map { $tc_Mixed[$_] => $_ } ( 0 .. $#tc_Mixed ) );
+my %tc_Punct = ( map { $tc_Punct[$_] => $_ } ( 0 .. $#tc_Punct ) );
+
+my %tc_ModePoint = (
+  $tc_modes{al} => \%tc_Alpha,
+  $tc_modes{as} => \%tc_Alpha,
+  $tc_modes{ll} => \%tc_Lower,
+  $tc_modes{ml} => \%tc_Mixed,
+  $tc_modes{pl} => \%tc_Punct,
+  $tc_modes{ps} => \%tc_Punct,
+);
+
+my $tc_AlphaRegex = quotemeta join("",grep { ord($_) < 0xF0 } @tc_Alpha);
+my $tc_LowerRegex = quotemeta join("",grep { ord($_) < 0xF0 } @tc_Lower);
+my $tc_MixedRegex = quotemeta join("",grep { ord($_) < 0xF0 } @tc_Mixed);
+my $tc_PunctRegex = quotemeta join("",grep { ord($_) < 0xF0 } @tc_Punct);
+my $tc_ModeSwitch = quotemeta join("",grep { ord($_) > 0xF0 } map { chr($_) } values %tc_modes);
 
 my $tc_RegexFast = qr/\G(?:
   (?<al>[$tc_AlphaRegex]+)|
@@ -39,9 +56,11 @@ my $tc_RegexFast = qr/\G(?:
 )/x;
 
 my $tc_Regex = qr/\G(?:
+#  (?<as>(?<=[$tc_LowerRegex])[$tc_AlphaRegex](?=[^$tc_AlphaRegex]))| # To encode 1 characters it's <as>X<?l>  (3) v.s. <?l><al>X<?l> (4)
+  (?<as>(?<=[$tc_LowerRegex])[$tc_AlphaRegex]{1,3}(?=[$tc_LowerRegex]))| # To encode 3 characters it's <as>X<as>X<as>X (6) v.s. <ml><al>XXX<ll> (6)
   (?<al>[$tc_AlphaRegex]+)|
   (?<ll>[$tc_LowerRegex]+)|
-  (?<pl>(?<=[$tc_MixedRegex])[$tc_PunctRegex]{2,}(?=[$tc_AlphaRegex]|$))| # This is pretty much free, as we just need <pl> but require 2 to prevent useless switching.
+  (?<pl>(?<=[$tc_MixedRegex])[$tc_PunctRegex]{2,}(?=[$tc_AlphaRegex]|$))| # This is pretty much free for 1, as we just need <pl> but require 2 to prevent useless switching.
   (?<pl>(?<=[$tc_MixedRegex])[$tc_PunctRegex]{3,})| # We need <pl>...<al><return> -- 3 characters take up 6 for this, v.s. 6 for <ps>.
   (?<ml>[$tc_MixedRegex]+)|
   (?<pl>[$tc_PunctRegex]{3,}(?=[$tc_AlphaRegex]|$))| # We need <ml><pl>...<al> -- 3 characters takes up 6 v.s. 6 for <ps>.
@@ -61,27 +80,83 @@ sub _preprocess_text($;$) {
       #  The cost is the same.
       $out[-1][0] = $mode;
       $out[-1][1] .= $data;
+    } elsif ( $mode =~ m/^.s$/ ) {
+      push @out, [$mode,$_] foreach split(//,$data); # I know this is horrible.
     } else {
       push @out, [$mode,$data]; # I know this is horrible.
     }
   }
-  return undef if (pos($t)||0) ne length($t);
+  die "got unknown character at " . (pos($t)||0) if (pos($t)||0) ne length($t);
   return \@out;
 }
 
-sub _preencode_text($;$) {
-  my ($t,$curMode) = @_;
-  
+# FIXME: make curMode respect 
+sub _preencode_text($;$$) {
+  my ($t,$fast,$curMode) = @_;
+
+  $curMode //= $tc_modes{al};
+  my $plan = _preprocess_text($t,$fast // 0);
+
+  my $out;
+  foreach my $item ( @$plan ) {
+    my $newMode = $tc_modes{$item->[0]};
+    if ( $curMode ne $newMode ) {
+        if ( $newMode == $tc_modes{al} ) {
+            $out .= chr($tc_modes{ps}) if !( $curMode == $tc_modes{ml} or $curMode == $tc_modes{pl} or $curMode == $tc_modes{ps} );
+        } elsif ( $newMode == $tc_modes{pl} ) {
+            $out .= chr($tc_modes{ml}) if $curMode != $tc_modes{ml};
+        } elsif  ( $curMode == $tc_modes{pl} or $curMode == $tc_modes{ps} ) {
+            $out .= chr($tc_modes{al}) if $newMode != $tc_modes{al};
+        }
+        $out .= chr($newMode);
+    }
+    $curMode = $newMode if $newMode != $tc_modes{as} and $newMode != $tc_modes{ps};
+
+    $out .= $item->[1];
+  }
+  return $out;
 }
 
-sub _compact_text($;$$$) {
-  my ($t,$latch,$curMode,$shiftFollows) = @_;
+sub _compact_text($;$$$$) {
+  my ($t,$latch,$curMode,$shiftFollows,$fast) = @_;
   $latch //= 1;
   $shiftFollows ||= 0;
   my $preshift = $curMode;
   my @out = ( $latch ? (900) : () );
 
-  return wantarray ? (\@out,$curMode) : \@out;
+  $curMode //= $tc_modes{al};
+  my $shiftMode = undef;
+
+  die "sanity: $curMode cannot be shifted mode" if $curMode == $tc_modes{as} || $curMode == $tc_modes{ps};
+
+  my $preencode = _preencode_text($t,$fast,$curMode);
+  while ( $preencode =~ m/(.)(.|$)/g ) {
+    my ($first,$second) = ($1,$2);
+    if ( $second eq '' ) { # Final
+      my $candMode = ( $first =~ m/[$tc_ModeSwitch]/ ) ? $first : $curMode;
+      $second = chr(
+        ( $candMode != $tc_modes{al} ) ? $tc_modes{ps} :
+        ( $candMode != $tc_modes{as} ) ? $tc_modes{ps} : # Had to come from 'll', so ps is always valid
+        ( $candMode != $tc_modes{ll} ) ? $tc_modes{ps} :
+        ( $candMode != $tc_modes{ml} ) ? $tc_modes{ps} :
+        ( $candMode != $tc_modes{pl} ) ? $tc_modes{al} :
+        ( $candMode != $tc_modes{ps} ) ? $tc_modes{ps} :
+        die "sanity: uknown\n");
+    }
+    my $codepoint = 0;
+    foreach my $chr ( $first, $second ) {
+      $codepoint = $codepoint*30 + ( $tc_ModePoint{$curMode || $shiftMode}{$chr} // die "sanity: $chr $curMode $shiftMode" );
+      $shiftMode = undef;
+      if ( ord($chr) == $tc_modes{as} || ord($chr) == $tc_modes{ps} ) {
+        $shiftMode = ord($chr);
+      } elsif ( $chr =~ m/[$tc_ModeSwitch]/ ) {
+        $curMode = ord($chr);
+      }
+    }
+    push @out,$codepoint;
+  }
+
+  return \@out;
 }
 
 sub _compact_number($;$) {

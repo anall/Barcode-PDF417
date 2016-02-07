@@ -20,7 +20,7 @@ use Barcode::PDF417::PP;
 
 plan( skip_all => "decode tests are disabled" ) if $ENV{NO_DECODE_TEST};
 plan( skip_all => "ZXing missing, not running decode tests -- see t/decode-simple.t for info" ) unless -e 'java/core.jar' and -e 'java/javase.jar';
-plan( skip_all => "Java helper, not running decode tests -- see t/decode-simple.t for info" ) unless -e 'java/BarcodePDF417Decode.class';
+plan( skip_all => "Java helper missing, not running decode tests -- see t/decode-simple.t for info" ) unless -e 'java/BarcodePDF417Decode.class';
 
 my $dir = tempdir( CLEANUP => $ENV{TEST_KEEP_FILES} ? 0 : 1 );
 my $fileId = 0;
@@ -78,7 +78,7 @@ sub confirm($$;$) {
   }
 }
 
-plan tests => 5;
+plan tests => 6;
 
 {
   my $n = 20 * 900**5 + 32 * 900**4 + 48 * 900**3 + 900**2 + 900**1;
@@ -100,3 +100,5 @@ plan tests => 5;
   my $partsB = Barcode::PDF417::PP::_compact_number("9876");
   confirm(Barcode::PDF417::PP::_build_symbol([@$partsA, @$partsB],10,10,5),"12349876", "two number pairs");
 }
+
+confirm(Barcode::PDF417::PP::_build_symbol(Barcode::PDF417::PP::_compact_text("PDF417"),10,10,5),"PDF417", "two number pairs");
