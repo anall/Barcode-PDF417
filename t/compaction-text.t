@@ -1,8 +1,9 @@
 #!/usr/bin/perl -w
 use strict;
-use Test::More;
-use Test::Exception;
 use List::Util qw(sum);
+
+use Test::More tests => 3;
+use Test::Exception;
 
 use Barcode::PDF417::PP;
 
@@ -70,21 +71,23 @@ subtest "preprocess", sub {
 };
 
 subtest "preencode", sub {
-    my $al = chr(0xFA);
-    my $as = chr(0xFB);
-    my $ll = chr(0xFC);
-    my $ml = chr(0xFD);
-    my $pl = chr(0xFE);
-    my $ps = chr(0xFF);
+    plan tests => 11;
+
+    my $c_al = chr($tc_al);
+    my $c_as = chr($tc_as);
+    my $c_ll = chr($tc_ll);
+    my $c_ml = chr($tc_ml);
+    my $c_pl = chr($tc_pl);
+    my $c_ps = chr($tc_ps);
 
     my $pre_and_fmt = sub {
-        my $x = Barcode::PDF417::PP::_preencode_text($_[0]);
-        $x =~ s/$al/<al>/g;
-        $x =~ s/$as/<as>/g;
-        $x =~ s/$ll/<ll>/g;
-        $x =~ s/$ml/<ml>/g;
-        $x =~ s/$pl/<pl>/g;
-        $x =~ s/$ps/<ps>/g;
+        my $x = Barcode::PDF417::PP::_preencode_text($_[0],$_[1],$_[2]);
+        $x =~ s/$c_al/<al>/g;
+        $x =~ s/$c_as/<as>/g;
+        $x =~ s/$c_ll/<ll>/g;
+        $x =~ s/$c_ml/<ml>/g;
+        $x =~ s/$c_pl/<pl>/g;
+        $x =~ s/$c_ps/<ps>/g;
         return $x;
     };
 
@@ -98,13 +101,14 @@ subtest "preencode", sub {
     is($pre_and_fmt->("????om"), "<ml><pl>????<al><ll>om");
     is($pre_and_fmt->("PDF417"), "PDF<ml>417");
 
-    done_testing();
+    # Let's try pre-existing
+    is($pre_and_fmt->("PDF417",undef,$tc_ml), "<al>PDF<ml>417");
+    is($pre_and_fmt->("PDF417",undef,$tc_ll), "<ps><al>PDF<ml>417");
 };
 
 subtest "preencode", sub {
+    plan tests => 2;
+
     is_deeply( scalar(Barcode::PDF417::PP::_compact_text("PDF417",0)),[453,178,121,239], "PDF417 -- from manual");
-
-    done_testing();
+    is_deeply( scalar(Barcode::PDF417::PP::_compact_text("PDF41",0)),[453,178,121], "PDF41");
 };
-
-done_testing();
