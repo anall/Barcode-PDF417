@@ -78,7 +78,7 @@ sub confirm($$;$) {
   }
 }
 
-plan tests => 5;
+plan tests => 6;
 
 {
   my $n = 20 * 900**5 + 32 * 900**4 + 48 * 900**3 + 900**2 + 900**1;
@@ -100,3 +100,5 @@ plan tests => 5;
   my $partsB = Barcode::PDF417::PP::_compact_number("9876");
   confirm(Barcode::PDF417::PP::_build_symbol([@$partsA, @$partsB],10,10,5),"12349876", "two number pairs");
 }
+
+confirm(Barcode::PDF417::PP::_build_symbol(Barcode::PDF417::PP::_compact_text("PDF417"),10,10,5),"PDF417", "two number pairs");

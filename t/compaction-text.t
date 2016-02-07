@@ -96,6 +96,15 @@ subtest "preencode", sub {
     is($pre_and_fmt->("1OM"), "<ml>1<al>OM");
     is($pre_and_fmt->("???OM"), "<ml><pl>???<al>OM");
     is($pre_and_fmt->("????om"), "<ml><pl>????<al><ll>om");
+    is($pre_and_fmt->("PDF417"), "PDF<ml>417");
+
+    done_testing();
+};
+
+subtest "preencode", sub {
+    is_deeply( scalar(Barcode::PDF417::PP::_compact_text("PDF417",0)),[453,178,121,239], "PDF417 -- from manual");
+
+    done_testing();
 };
 
 done_testing();
