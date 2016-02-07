@@ -1,7 +1,6 @@
 language: perl
 before_install:
-  - if [[ -e $HOME/.cache/jar ]]; then cp $HOME/.cache/jar/*.jar java; fi
-  - (cd java && ./install.sh)
+  - (cd java && ./travis-install.sh)
 before_cache:
   - mkdir -p $HOME/.cache/jar
   - cp java/*.jar $HOME/.cache/jar
