@@ -1,5 +1,5 @@
 java/*.jar
-java/*.class
+java/lib
 /blib/
 /.build/
 _build/

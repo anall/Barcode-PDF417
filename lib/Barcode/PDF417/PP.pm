@@ -134,6 +134,7 @@ sub _compact_text($;$$$$) {
     my ($first,$second) = ($1,$2);
     if ( $second eq '' ) { # Final
       my $candMode = ( $first =~ m/[$tc_ModeSwitch]/ ) ? $first : $curMode;
+      # FIXME: Some of these should never actually happen
       $second = chr(
         ( $candMode != $tc_modes{al} ) ? $tc_modes{ps} :
         ( $candMode != $tc_modes{as} ) ? $tc_modes{ps} : # Had to come from 'll', so ps is always valid
