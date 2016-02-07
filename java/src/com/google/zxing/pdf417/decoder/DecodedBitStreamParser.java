@@ -103,6 +103,7 @@ final class DecodedBitStreamParser {
     int codeIndex = 1;
     int code = codewords[codeIndex++];
     PDF417ResultMetadata resultMetadata = new PDF417ResultMetadata();
+    resultMetadata.setCodewords(codewords); // LOCAL CHANGE
     while (codeIndex < codewords[0]) {
       switch (code) {
         case TEXT_COMPACTION_MODE_LATCH:

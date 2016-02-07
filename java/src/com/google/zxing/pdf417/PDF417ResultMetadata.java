@@ -25,6 +25,7 @@ public final class PDF417ResultMetadata {
   private String fileId;
   private int[] optionalData;
   private boolean lastSegment;
+  private int[] codewords;
 
   public int getSegmentIndex() {
     return segmentIndex;
@@ -56,6 +57,14 @@ public final class PDF417ResultMetadata {
 
   public void setLastSegment(boolean lastSegment) {
     this.lastSegment = lastSegment;
+  }
+
+  public int[] getCodewords() {
+    return codewords;
+  }
+
+  public void setCodewords(int[] codewords) {
+    this.codewords = codewords;
   }
 
 }

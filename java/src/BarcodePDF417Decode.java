@@ -37,6 +37,8 @@ import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.multi.GenericMultipleBarcodeReader;
 import com.google.zxing.multi.MultipleBarcodeReader;
 
+import com.google.zxing.pdf417.PDF417ResultMetadata;
+
 import com.google.zxing.client.j2se.ImageReader;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 
@@ -79,8 +81,18 @@ public final class BarcodePDF417Decode {
     }
 
     Result result = results[0];
+    Map<ResultMetadataType,Object> metadata = result.getResultMetadata();
+    PDF417ResultMetadata pdfMetadata = (PDF417ResultMetadata)metadata.get(ResultMetadataType.PDF417_EXTRA_METADATA);
+
     System.out.println( result.getBarcodeFormat() );
     System.out.println( result.getResultMetadata().get(ResultMetadataType.ERROR_CORRECTION_LEVEL) );
+
+    int codewords[] = pdfMetadata.getCodewords();
+    for ( int i : codewords ) {
+      System.out.format("%d ",i);
+    }
+    System.out.print("\n");
+
     byte bytes[] = result.getText().getBytes();
     for ( byte b : bytes ) {
       System.out.format("%02x",b);
