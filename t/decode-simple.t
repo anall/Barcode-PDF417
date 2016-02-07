@@ -20,7 +20,7 @@ use Barcode::PDF417::PP;
 
 plan( skip_all => "decode tests are disabled" ) if $ENV{NO_DECODE_TEST};
 plan( skip_all => "ZXing missing, not running decode tests -- see t/decode-simple.t for info" ) unless -e 'java/core.jar' and -e 'java/javase.jar';
-plan( skip_all => "Java helper, not running decode tests -- see t/decode-simple.t for info" ) unless -e 'java/BarcodePDF417Decode.class';
+plan( skip_all => "Java helper missing, not running decode tests -- see t/decode-simple.t for info" ) unless -e 'java/BarcodePDF417Decode.class';
 
 my $dir = tempdir( CLEANUP => $ENV{TEST_KEEP_FILES} ? 0 : 1 );
 my $fileId = 0;
