@@ -86,7 +86,7 @@ sub confirm($$;$) {
   }
 }
 
-plan tests => 7;
+plan tests => 8;
 
 {
   my $n = 20 * 900**5 + 32 * 900**4 + 48 * 900**3 + 900**2 + 900**1;
@@ -111,3 +111,4 @@ plan tests => 7;
 
 confirm([Barcode::PDF417::PP::_compact_text("PDF417"  ),10,10,5],"PDF417", "PDF417 w/ latch");
 confirm([Barcode::PDF417::PP::_compact_text("PDF417",0),10,10,5],"PDF417", "PDF417 w/o latch");
+confirm([Barcode::PDF417::PP::_compact_text("PDF417!!!",0),10,10,5],"PDF417!!!", "PDF417 symbols");

@@ -71,7 +71,7 @@ subtest "preprocess", sub {
 };
 
 subtest "preencode", sub {
-    plan tests => 11;
+    plan tests => 12;
 
     my $c_al = chr($tc_al);
     my $c_as = chr($tc_as);
@@ -104,11 +104,14 @@ subtest "preencode", sub {
     # Let's try pre-existing
     is($pre_and_fmt->("PDF417",undef,$tc_ml), "<al>PDF<ml>417");
     is($pre_and_fmt->("PDF417",undef,$tc_ll), "<ps><al>PDF<ml>417");
+
+    is($pre_and_fmt->("PDF417!!!"), "PDF<ml>417<pl>!!!");
 };
 
 subtest "preencode", sub {
-    plan tests => 2;
+    plan tests => 3;
 
     is_deeply( scalar(Barcode::PDF417::PP::_compact_text("PDF417",0)),[453,178,121,239], "PDF417 -- from manual");
     is_deeply( scalar(Barcode::PDF417::PP::_compact_text("PDF41",0)),[453,178,121], "PDF41");
+    is_deeply( scalar(Barcode::PDF417::PP::_compact_text("PDF417!!!",0)),[453,178,121,235,310,329],"PDF<ml>417<pl>!!!");
 };

@@ -136,17 +136,17 @@ sub _compact_text($;$$$$) {
       my $candMode = ( $first =~ m/[$tc_ModeSwitch]/ ) ? $first : $curMode;
       # FIXME: Some of these should never actually happen
       $second = chr(
-        ( $candMode != $tc_modes{al} ) ? $tc_modes{ps} :
-        ( $candMode != $tc_modes{as} ) ? $tc_modes{ps} : # Had to come from 'll', so ps is always valid
-        ( $candMode != $tc_modes{ll} ) ? $tc_modes{ps} :
-        ( $candMode != $tc_modes{ml} ) ? $tc_modes{ps} :
-        ( $candMode != $tc_modes{pl} ) ? $tc_modes{al} :
-        ( $candMode != $tc_modes{ps} ) ? $tc_modes{ps} :
+        ( $candMode == $tc_modes{al} ) ? $tc_modes{ps} :
+        ( $candMode == $tc_modes{as} ) ? $tc_modes{ps} : # Had to come from 'll', so ps is always valid
+        ( $candMode == $tc_modes{ll} ) ? $tc_modes{ps} :
+        ( $candMode == $tc_modes{ml} ) ? $tc_modes{ps} :
+        ( $candMode == $tc_modes{pl} ) ? $tc_modes{al} :
+        ( $candMode == $tc_modes{ps} ) ? $tc_modes{ps} :
         die "sanity: uknown\n");
     }
     my $codepoint = 0;
     foreach my $chr ( $first, $second ) {
-      $codepoint = $codepoint*30 + ( $tc_ModePoint{$curMode || $shiftMode}{$chr} // die "sanity: $chr $curMode $shiftMode" );
+      $codepoint = $codepoint*30 + ( $tc_ModePoint{$curMode || $shiftMode}{$chr} // die "sanity: " . ord($chr) . " $curMode $shiftMode" );
       $shiftMode = undef;
       if ( ord($chr) == $tc_modes{as} || ord($chr) == $tc_modes{ps} ) {
         $shiftMode = ord($chr);
