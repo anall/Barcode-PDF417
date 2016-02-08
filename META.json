@@ -42,9 +42,9 @@
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://opensource.org/licenses/artistic-license-2.0.php"
+         "http://www.perlfoundation.org/artistic_license_2_0"
       ]
    },
    "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

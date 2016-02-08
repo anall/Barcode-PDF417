@@ -86,7 +86,7 @@ sub confirm($$;$) {
   }
 }
 
-plan tests => 8;
+plan tests => 10;
 
 {
   my $n = 20 * 900**5 + 32 * 900**4 + 48 * 900**3 + 900**2 + 900**1;
@@ -112,3 +112,7 @@ plan tests => 8;
 confirm([Barcode::PDF417::PP::_compact_text("PDF417"  ),10,10,5],"PDF417", "PDF417 w/ latch");
 confirm([Barcode::PDF417::PP::_compact_text("PDF417",0),10,10,5],"PDF417", "PDF417 w/o latch");
 confirm([Barcode::PDF417::PP::_compact_text("PDF417!!!",0),10,10,5],"PDF417!!!", "PDF417 symbols");
+
+confirm([ [924,@{Barcode::PDF417::PP::_compact_byte_raw("abcdef")}] ,10,10,5],"abcdef","");
+confirm([ [924,@{Barcode::PDF417::PP::_compact_byte_raw(
+    pack("C*",231,101,11,97,205,2))}] ,10,10,5],pack("H*","c3a7650b61c38d02"),"");

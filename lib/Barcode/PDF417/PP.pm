@@ -3,6 +3,7 @@ use Barcode::PDF417::PP_Tables;
 
 use strict;
 use warnings;
+use Math::Int64 qw(net_to_int64 :native_if_available);
 
 my $startSymbol = "81111113";
 my $endSymbol   = "711311121";
@@ -187,6 +188,22 @@ sub _compact_number_raw($) {
     unshift @codewords, $t % 900;
     $t = int( $t/900 );
   }
+  return \@codewords;
+}
+
+sub _compact_byte_raw($) {
+  use integer; # Make sure this behaves properly even in native mode
+  my ($v) = @_;
+  die "only 6 bytes allowed\n" if length($v) != 6;
+
+  my $bin = net_to_int64("\0\0".$v);
+print ref($bin) . "\n";
+  my @codewords = (undef,undef,undef,undef,undef);
+  for ( my $i = 4; $i >= 0; --$i) {
+    $codewords[$i] = $bin % 900; 
+    $bin = $bin / 900;
+  }
+  die "sanity: $bin left over" if $bin; # uncoverable branch true
   return \@codewords;
 }
 

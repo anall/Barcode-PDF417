@@ -18,6 +18,7 @@ my $builder = Module::Build->new(
     'IO::File' => 0,
   },
   requires => {
+    'Math::Int64' => 0,
   },
   add_to_cleanup     => [ 'Barcode-PDF417-*' ],
   create_makefile_pl => 'traditional',

@@ -2,11 +2,11 @@
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'PREREQ_PM' => {},
-  'EXE_FILES' => [],
   'NAME' => 'Barcode::PDF417',
-  'PL_FILES' => {},
   'VERSION_FROM' => 'lib/Barcode/PDF417.pm',
-  'INSTALLDIRS' => 'site'
+  'PREREQ_PM' => {},
+  'INSTALLDIRS' => 'site',
+  'EXE_FILES' => [],
+  'PL_FILES' => {}
 )
 ;
