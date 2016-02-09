@@ -93,7 +93,7 @@ public final class BarcodePDF417Decode {
     }
     System.out.print("\n");
 
-    byte bytes[] = result.getText().getBytes();
+    byte bytes[] = result.getText().getBytes( "ISO-8859-1" );
     for ( byte b : bytes ) {
       System.out.format("%02x",b);
     }

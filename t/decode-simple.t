@@ -115,4 +115,4 @@ confirm([Barcode::PDF417::PP::_compact_text("PDF417!!!",0),10,10,5],"PDF417!!!",
 
 confirm([ [924,@{Barcode::PDF417::PP::_compact_byte_raw("abcdef")}] ,10,10,5],"abcdef","");
 confirm([ [924,@{Barcode::PDF417::PP::_compact_byte_raw(
-    pack("C*",231,101,11,97,205,2))}] ,10,10,5],pack("H*","c3a7650b61c38d02"),"");
+    pack("C*",231,101,11,97,205,2))}] ,10,10,5],pack("C*",231,101,11,97,205,2),"");
